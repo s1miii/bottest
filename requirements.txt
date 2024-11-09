@@ -1,3 +1,2 @@
 Flask
 web3
-pip freeze > requirements.txt
