@@ -6,7 +6,12 @@ import time
 
 # Initialize Flask app and Telegram bot
 app = Flask(__name__)
-bot_token = os.getenv("7377605568:AAGNNDS1uRGr003MIV1gneMqcZXWdyBTz1s")
+bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+
+# Check if bot_token was successfully retrieved
+if bot_token is None:
+    raise ValueError("TELEGRAM_BOT_TOKEN environment variable is not set or is empty.")
+
 bot = telebot.TeleBot(bot_token)
 
 # Set your channel chat ID here (e.g., -1001234567890 for private channels)
