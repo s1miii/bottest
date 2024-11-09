@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Deployment Checker</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Token Deployment Checker</h1>
+        <button id="statusBtn">Check Bot Status</button>
+        <button id="checkBtn">Check for New Deployments</button>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        document.getElementById("statusBtn").addEventListener("click", function() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("result").innerText = JSON.stringify(data, null, 2);
+                });
+        });
+
+        document.getElementById("checkBtn").addEventListener("click", function() {
+            fetch('/check')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("result").innerText = JSON.stringify(data, null, 2);
+                });
+        });
+    </script>
+</body>
+</html>
