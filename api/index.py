@@ -26,9 +26,12 @@ if not RPC_URL:
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 bot = telebot.TeleBot(bot_token)
 
-# Check blockchain connection
-if not w3.isConnected():
-    raise ConnectionError("Failed to connect to the blockchain via RPC URL.")
+# Check blockchain connection by attempting to fetch the latest block number
+try:
+    latest_block = w3.eth.block_number
+    print("Connected to the blockchain. Latest block:", latest_block)
+except Exception as e:
+    raise ConnectionError(f"Failed to connect to the blockchain via RPC URL: {e}")
 
 print("Connected to the blockchain. Monitoring for deployments...")
 
