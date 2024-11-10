@@ -19,7 +19,7 @@ CHANNEL_CHAT_ID = os.getenv("CHANNEL_CHAT_ID", "-1002461638660")
 
 # Blockchain configuration
 TARGET_ADDRESS = os.getenv("TARGET_ADDRESS", "0xc204af95b0307162118f7bc36a91c9717490ab69")
-RPC_URL = os.getenv("RPC_URL", "https://mainnet.base.org")
+RPC_URL = os.getenv("RPC_URL", "https://base-mainnet.g.alchemy.com/v2/a6pyXUFXfmPbkwqJ9cCvfyjKL4LjK32u")
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 # Function to send a message to the Telegram channel
