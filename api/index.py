@@ -2,26 +2,35 @@ from flask import Flask, jsonify
 from web3 import Web3
 import os
 import telebot
-import time
 import threading
+import time
 
 # Initialize Flask app and Telegram bot
 app = Flask(__name__)
+
+# Load environment variables
 bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
-
-# Check if bot_token was successfully retrieved
-if bot_token is None:
-    raise ValueError("TELEGRAM_BOT_TOKEN environment variable is not set or is empty.")
-
-bot = telebot.TeleBot(bot_token)
-
-# Set your channel chat ID here (e.g., -1001234567890 for private channels)
 CHANNEL_CHAT_ID = os.getenv("CHANNEL_CHAT_ID", "-1002461638660")
-
-# Blockchain configuration
 TARGET_ADDRESS = os.getenv("TARGET_ADDRESS", "0xc204af95b0307162118f7bc36a91c9717490ab69")
 RPC_URL = os.getenv("RPC_URL", "https://base-mainnet.g.alchemy.com/v2/a6pyXUFXfmPbkwqJ9cCvfyjKL4LjK32u")
+
+# Check if required environment variables are set
+if not bot_token:
+    raise ValueError("TELEGRAM_BOT_TOKEN environment variable is not set or is empty.")
+if not CHANNEL_CHAT_ID:
+    raise ValueError("CHANNEL_CHAT_ID environment variable is not set or is empty.")
+if not RPC_URL:
+    raise ValueError("RPC_URL environment variable is not set or is empty.")
+
+# Initialize Web3 and Telegram bot
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
+bot = telebot.TeleBot(bot_token)
+
+# Check blockchain connection
+if not w3.isConnected():
+    raise ConnectionError("Failed to connect to the blockchain via RPC URL.")
+
+print("Connected to the blockchain. Monitoring for deployments...")
 
 # Function to send a message to the Telegram channel
 def send_telegram_message(message):
@@ -77,16 +86,12 @@ def monitor_for_deployments():
             print(f"Error in monitoring: {e}")
             time.sleep(30)
 
-# Start the monitoring in a separate thread
-def start_monitoring():
-    monitor_thread = threading.Thread(target=monitor_for_deployments)
-    monitor_thread.daemon = True  # This allows the thread to close when the main program exits
-    monitor_thread.start()
-
 # Route to start monitoring (optional endpoint)
 @app.route('/start_monitoring', methods=['GET'])
-def start_monitoring_route():
-    start_monitoring()  # Start monitoring in a background thread
+def start_monitoring():
+    # Start the monitoring in the background (as an example)
+    monitor_thread = threading.Thread(target=monitor_for_deployments)
+    monitor_thread.start()
     return jsonify({"status": "Monitoring started"}), 200
 
 # Status endpoint
@@ -96,5 +101,9 @@ def status():
 
 # Main entry point for the Flask app
 if __name__ == "__main__":
-    start_monitoring()  # Start monitoring on app start
+    # Start the monitoring thread
+    monitor_thread = threading.Thread(target=monitor_for_deployments)
+    monitor_thread.start()
+
+    # Start the Flask server
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
