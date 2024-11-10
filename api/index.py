@@ -72,11 +72,11 @@ def monitor_for_deployments():
                 latest_block = new_block
 
             # Wait before checking the next block
-            time.sleep(5)
+            time.sleep(30)
 
         except Exception as e:
             print(f"Error in monitoring: {e}")
-            time.sleep(10)
+            time.sleep(30)
 
 # Route to start monitoring (optional endpoint)
 @app.route('/start_monitoring', methods=['GET'])
