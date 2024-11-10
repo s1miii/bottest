@@ -3,6 +3,7 @@ from web3 import Web3
 import os
 import telebot
 import time
+import threading
 
 # Initialize Flask app and Telegram bot
 app = Flask(__name__)
@@ -50,8 +51,6 @@ def monitor_for_deployments():
                         receipt = w3.eth.get_transaction_receipt(tx['hash'])
                         contract_address = receipt.contractAddress
 
-                        
-                        
                         # Generate the direct buy link
                         buy_link = f"https://t.me/SigmaTrading3_bot?start=buy_{contract_address}"
                         
@@ -63,7 +62,7 @@ def monitor_for_deployments():
                             f"🔹 Contract Address: {contract_address}\n"
                             f"🔹 Block Number: {new_block}\n"
                             f"Check the transaction: https://basescan.org/tx/{tx['hash'].hex()}\n"
-                            f"Check the contract: https://basescan.org/address/{contract_address}"
+                            f"Check the contract: https://basescan.org/address/{contract_address}\n"
                             f"💰 [Direct Buy Link with @SigmaTrading3_bot]({buy_link})"
                         )
                         send_telegram_message(deployment_message)
@@ -78,13 +77,16 @@ def monitor_for_deployments():
             print(f"Error in monitoring: {e}")
             time.sleep(30)
 
+# Start the monitoring in a separate thread
+def start_monitoring():
+    monitor_thread = threading.Thread(target=monitor_for_deployments)
+    monitor_thread.daemon = True  # This allows the thread to close when the main program exits
+    monitor_thread.start()
+
 # Route to start monitoring (optional endpoint)
 @app.route('/start_monitoring', methods=['GET'])
-def start_monitoring():
-    # Start the monitoring in the background (as an example)
-    import threading
-    monitor_thread = threading.Thread(target=monitor_for_deployments)
-    monitor_thread.start()
+def start_monitoring_route():
+    start_monitoring()  # Start monitoring in a background thread
     return jsonify({"status": "Monitoring started"}), 200
 
 # Status endpoint
@@ -94,7 +96,5 @@ def status():
 
 # Main entry point for the Flask app
 if __name__ == "__main__":
-    # Start monitoring on app start
-    monitor_for_deployments()
-    # Uncomment the following line if you only want to run Flask server without monitoring
-    # app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    start_monitoring()  # Start monitoring on app start
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
