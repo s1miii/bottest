@@ -49,6 +49,11 @@ def monitor_for_deployments():
                         # Get contract address from the transaction receipt
                         receipt = w3.eth.get_transaction_receipt(tx['hash'])
                         contract_address = receipt.contractAddress
+
+                        
+                        
+                        # Generate the direct buy link
+                        buy_link = f"https://t.me/SigmaTrading3_bot?start=buy_{contract_address}"
                         
                         # Prepare and send deployment message to Telegram
                         deployment_message = (
@@ -59,6 +64,7 @@ def monitor_for_deployments():
                             f"🔹 Block Number: {new_block}\n"
                             f"Check the transaction: https://basescan.org/tx/{tx['hash'].hex()}\n"
                             f"Check the contract: https://basescan.org/address/{contract_address}"
+                            f"💰 [Direct Buy Link with @SigmaTrading3_bot]({buy_link})"
                         )
                         send_telegram_message(deployment_message)
 
@@ -66,7 +72,7 @@ def monitor_for_deployments():
                 latest_block = new_block
 
             # Wait before checking the next block
-            time.sleep(10)
+            time.sleep(5)
 
         except Exception as e:
             print(f"Error in monitoring: {e}")
